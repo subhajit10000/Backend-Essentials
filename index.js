@@ -224,3 +224,78 @@ const loginUser = async (email, password) => {
     return token;
 }
 module.exports = { helloService, registerUser, loginUser }
+
+
+
+
+
+
+
+
+
+
+
+//user.service.js
+//------------------
+const users = require("../data/users.js");
+const getUserById = (id) => {
+    return users.find((user) => user.id === id);
+}
+module.exports = { getUserById };
+
+
+
+
+
+
+//hash.util.js
+//---------------
+const bcrypt = require("bcryptjs");
+// hashing abc => ksf87r4r2rirgweifgeweig
+const hashedPassword = async (password) => {
+    return await bcrypt.hash(password, 10);
+}
+// compare = > convert your password to hash and then compare both the hashed pass
+const comparePassword = async (password, hashedPassword) => {
+    return await bcrypt.compare(password, hashedPassword);
+}
+
+module.exports = {
+    hashedPassword, comparePassword
+}
+
+
+
+
+
+
+//jwt.util.js
+//---------------
+const bcrypt = require("bcryptjs");
+
+// hashing abc => ksf87r4r2rirgweifgeweig
+const hashedPassword = async (password) => {
+    return await bcrypt.hash(password, 10);
+}
+
+// compare = > convert your password to hash and then compare both the hashed pass
+const comparePassword = async (password, hashedPassword) => {
+    return await bcrypt.compare(password, hashedPassword);
+}
+
+module.exports = {
+    hashedPassword, comparePassword
+}
+
+
+
+
+
+
+
+
+
+//.env
+//---------
+PORT=5000
+JWT_SECRET=SOMETHINGSECRET
