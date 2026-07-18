@@ -153,3 +153,74 @@ const profile = async (req, res, next) => {
     })
 }
 module.exports = { profile }
+
+
+
+
+
+
+
+
+//auth.service.js
+//---------------------
+const users = require("../data/users.js");
+const {
+    hashedPassword, comparePassword
+} = require("../utils/hash.util.js");
+
+const {
+    generateToken, verifyToken
+} = require("../utils/jwt.util.js");
+
+const helloService = () => {
+    return "Hello Hi, tata by by";
+}
+
+
+const registerUser = async (name, email, password) => {
+    const existingUser = users.find((user) => user.email === email);
+    if (existingUser) {
+        throw new Error("User already exists.")
+    }
+
+    // hashing the password.
+    const pass = await hashedPassword(password);
+    const newUser = {
+        id: Date.now(),
+        name,
+        email,
+        password: pass
+    }
+
+    users.push(newUser);
+
+    return {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        password: newUser.password
+    }
+};
+
+const loginUser = async (email, password) => {
+
+    // email, password
+    // 1 : email => .user doesnt exist
+    const user = users.find((user) => user.email === email);
+    if (!user) {
+        throw new Error("Invalid credentials");
+    }
+    // 2 : password wrong
+    const isValid = await comparePassword(password, user.password);
+    if (!isValid) {
+        throw new Error("Invalid credentials");
+    }
+    // 3 : token generate 
+    const token = await generateToken({
+        id: user.id,
+        email: user.email
+    })
+    // 4 : response send 
+    return token;
+}
+module.exports = { helloService, registerUser, loginUser }
