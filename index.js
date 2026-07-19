@@ -43,11 +43,14 @@ module.exports = router;
 
 //user.routes.js
 //-----------------
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const authMiddleware = require("../middlewares/auth.middleware.js");
-const { profile } = require("../controllers/user.controller.js");
-router.get("/profile", authMiddleware, profile);
+const authMiddleware = require('../middlewares/auth.middleware.js');
+const { profile, getUsers, updateProfile, removeProfile } = require('../controllers/user.controller.js');
+router.get('/profile', authMiddleware, profile);
+router.get('/', authMiddleware, getUsers);
+router.put('/profile', authMiddleware, updateProfile);
+router.delete('/profile', authMiddleware, removeProfile);
 module.exports = router;
 
 
@@ -236,8 +239,6 @@ const {
 const helloService = () => {
     return "Hello Hi, tata by by";
 }
-
-
 const registerUser = async (name, email, password) => {
     const existingUser = users.find((user) => user.email === email);
     if (existingUser) {
@@ -245,6 +246,7 @@ const registerUser = async (name, email, password) => {
     }
 
     // hashing the password.
+
     const pass = await hashedPassword(password);
     const newUser = {
         id: Date.now(),
@@ -262,7 +264,6 @@ const registerUser = async (name, email, password) => {
         password: newUser.password
     }
 };
-
 const loginUser = async (email, password) => {
 
     // email, password
@@ -299,10 +300,42 @@ module.exports = { helloService, registerUser, loginUser }
 //user.service.js
 //------------------
 const users = require("../data/users.js");
+
 const getUserById = (id) => {
     return users.find((user) => user.id === id);
 }
-module.exports = { getUserById };
+const getAllUsers = ()=>{
+    return users
+    }
+const updatedUser = (userId, updates) => {
+
+    const user = users.find((user) => user.id === userId);
+
+    if (!user) {
+        throw new Error("User not found")
+    }
+
+    if (updates.name.trim()) {
+        user.name = updates.name.trim();
+    }
+    if (updates.email.trim()) {
+        user.email = updates.email.trim();
+    }
+
+    return user;
+}
+
+const deleteUser = (userId)=>{
+    const index=users.findIndex((user)=>user.id === userId)
+    if(index===-1){
+        throw new Error("notfound")
+    }
+    users.splice(index,1)
+    return true;
+}
+
+module.exports = { getUserById, getAllUsers, updatedUser, deleteUser };
+
 
 
 
